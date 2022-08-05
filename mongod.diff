@@ -1,0 +1,111 @@
+diff --git a/src/mongo/db/storage/storage_engine_lock_file_posix.cpp b/src/mongo/db/storage/storage_engine_lock_file_posix.cpp
+index 0d678857..382ad026 100644
+--- a/src/mongo/db/storage/storage_engine_lock_file_posix.cpp
++++ b/src/mongo/db/storage/storage_engine_lock_file_posix.cpp
+@@ -160,16 +160,6 @@ Status StorageEngineLockFile::open() {
+                                        "that another mongod instance is not already running on the "
+                                     << _dbpath << " directory");
+     }
+-    int ret = ::flock(lockFile, LOCK_EX | LOCK_NB);
+-    if (ret != 0) {
+-        int errorcode = errno;
+-        ::close(lockFile);
+-        return Status(ErrorCodes::DBPathInUse,
+-                      str::stream() << "Unable to lock the lock file: " << _filespec << " ("
+-                                    << errnoWithDescription(errorcode) << ")."
+-                                    << " Another mongod instance is already running on the "
+-                                    << _dbpath << " directory");
+-    }
+     _lockFileHandle->_fd = lockFile;
+     return Status::OK();
+ }
+diff --git a/src/mongo/util/processinfo_linux.cpp b/src/mongo/util/processinfo_linux.cpp
+index 37e3d2ea..f5b6fb43 100644
+--- a/src/mongo/util/processinfo_linux.cpp
++++ b/src/mongo/util/processinfo_linux.cpp
+@@ -74,70 +74,9 @@ public:
+     LinuxProc(ProcessId pid) {
+         auto name = "/proc/{}/stat"_format(pid.asUInt32());
+         FILE* f = fopen(name.c_str(), "r");
+-        if (!f) {
+-            auto e = errno;
+-            msgasserted(13538, "couldn't open [{}] {}"_format(name, errnoWithDescription(e)));
++        if (f) {
++            fclose(f);
+         }
+-        int found = fscanf(f,
+-                           "%d %127s %c "
+-                           "%d %d %d %d %d "
+-                           "%lu %lu %lu %lu %lu "
+-                           "%lu %lu %ld %ld " /* utime stime cutime cstime */
+-                           "%ld %ld "
+-                           "%ld "
+-                           "%ld "
+-                           "%lu " /* start_time */
+-                           "%lu "
+-                           "%ld "  // rss
+-                           "%lu %" KLF "u %" KLF "u %" KLF "u %" KLF "u %" KLF "u "
+-                           /*
+-                             "%*s %*s %*s %*s "
+-                             "%"KLF"u %*lu %*lu "
+-                             "%d %d "
+-                             "%lu %lu"
+-                           */
+-
+-                           ,
+-
+-                           &_pid,
+-                           _comm,
+-                           &_state,
+-                           &_ppid,
+-                           &_pgrp,
+-                           &_session,
+-                           &_tty,
+-                           &_tpgid,
+-                           &_flags,
+-                           &_min_flt,
+-                           &_cmin_flt,
+-                           &_maj_flt,
+-                           &_cmaj_flt,
+-                           &_utime,
+-                           &_stime,
+-                           &_cutime,
+-                           &_cstime,
+-                           &_priority,
+-                           &_nice,
+-                           &_nlwp,
+-                           &_alarm,
+-                           &_start_time,
+-                           &_vsize,
+-                           &_rss,
+-                           &_rss_rlim,
+-                           &_start_code,
+-                           &_end_code,
+-                           &_start_stack,
+-                           &_kstk_esp,
+-                           &_kstk_eip
+-
+-                           /*
+-                             &_wchan,
+-                             &_exit_signal, &_processor,
+-                             &_rtprio, &_sched
+-                           */
+-        );
+-        massert(13539, "couldn't parse [{}]"_format(name).c_str(), found != 0);
+-        fclose(f);
+     }
+ 
+     unsigned long getVirtualMemorySize() {
+diff --git a/src/third_party/wiredtiger/src/os_posix/os_fs.c b/src/third_party/wiredtiger/src/os_posix/os_fs.c
+index 1ae6259e..a83ff732 100644
+--- a/src/third_party/wiredtiger/src/os_posix/os_fs.c
++++ b/src/third_party/wiredtiger/src/os_posix/os_fs.c
+@@ -28,6 +28,8 @@
+ 
+ #include "wt_internal.h"
+ 
++#undef HAVE_FTRUNCATE
++
+ /*
+  * __posix_sync --
+  *     Underlying support function to flush a file descriptor. Fsync calls (or fsync-style calls,

@@ -1,0 +1,18 @@
+version: '2'
+
+services:
+
+  mongodb:
+    image: enclaive/mongodb-sgx:latest
+    build: .
+    devices:
+      - "/dev/sgx/enclave:/dev/sgx/enclave"
+      - "/dev/sgx/enclave:/dev/sgx_enclave"
+      - "/dev/sgx_provision:/dev/sgx_provision"
+    volumes:
+      - type: volume
+        target: /data
+      - type: volume
+        target: /logs
+    ports:
+      - "27017:27017"

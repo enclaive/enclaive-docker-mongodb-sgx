@@ -1,0 +1,59 @@
+loader.entrypoint = "file:{{ gramine.libos }}"
+
+libos.entrypoint = "/app/mongo/bin/mongod"
+loader.argv_src_file = "file:/app/argv"
+
+loader.log_level = "error"
+#loader.log_file = "log.txt"
+
+loader.env.LD_LIBRARY_PATH = "/lib:{{ arch_libdir }}"
+loader.env.MALLOC_ARENA_MAX = "1"
+
+loader.uid = {{ app_uid }}
+loader.gid = {{ app_gid }}
+
+sys.stack.size = "1024K"
+sys.insecure__allow_eventfd = true
+
+fs.mounts = [
+    { path = "/tmp",              uri = "file:/tmp", type = "tmpfs" },
+    { path = "/etc",              uri = "file:/etc" },
+    { path = "/usr",              uri = "file:/usr" },
+    { path = "/lib",              uri = "file:{{ gramine.runtimedir() }}" },
+    { path = "{{ arch_libdir }}", uri = "file:{{ arch_libdir }}" },
+    { path = "/app",              uri = "file:/app" },
+
+    { path = "/var/lib/mongodb",  uri = "file:/data", type = "encrypted", key_name = "data" },
+    { path = "/var/log/mongodb",  uri = "file:/logs", type = "encrypted", key_name = "logs" },
+]
+fs.insecure__keys.data = "ffeeddccbbaa99887766554433221100"
+fs.insecure__keys.logs = "00112233445566778899aabbccddeeff"
+
+sgx.thread_num = 128
+sgx.enclave_size = "4G"
+
+sgx.debug = false
+sgx.isvprodid = 1
+sgx.isvsvn    = 1
+
+sgx.trusted_files = [
+    "file:{{ gramine.libos }}",
+    "file:{{ gramine.runtimedir() }}/",
+    "file:{{ arch_libdir }}/",
+
+    "file:/app/argv",
+    "file:/app/mongo/bin/mongod",
+    "file:/app/mongod.conf",
+
+    "file:/etc/lsb-release",
+    "file:/etc/nsswitch.conf",
+
+    "file:/etc/group",
+    "file:/etc/passwd",
+
+    "file:/etc/localtime",
+    "file:/etc/timezone",
+
+    "file:/usr/share/zoneinfo/",
+    "file:/usr/lib/ssl/openssl.cnf",
+]
