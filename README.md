@@ -13,7 +13,7 @@
     </table>
 
 
-  <h2 align="center">SGX-ready MongoDB: Fully Memory-encrypted Database while in Use</h2>
+  <h2 align="center">SGX-ready MongoDB: JSON Database fully memory-encrypted while in Use</h2>
 
   <p align="center">
     <h3>packed by <a href="https://enclaive.io">enclaive</a></h3>
