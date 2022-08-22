@@ -61,6 +61,8 @@ Following benefits come for free with MongoDB-SGX :
 
 - security: MongoDB-SGX gives data the safest place a database can give going beyond database encryption ("data at rest")
 - black box database: not only is the database encrypted, but also queries to the database remain fully encrypted in the memory ("data in use")
+- no static table encryption needed: database running in a confidential container by design encrypts the query, query processing on data, and the database
+- no key rotation needed: avoid key management and update complexities known from data-at-rest databases
 - untraceability: when combined with TLS, MongoDB-SGX keeps the user interacting with the database indistinguishable from any other user interaction even
 - hardened security against memory dumps, query and user de-anonymization including kernel-space exploits, malicious and accidental privilege [insider](https://www.ibm.com/topics/insider-threats) attacks, [UEFI firmware](https://thehackernews.com/2022/02/dozens-of-security-flaws-discovered-in.html) exploits and other "root" attacks using the corruption of the application to infiltrate your network and system
 - runs on any hosting environment irrespectivably of geo-location and complies with privacy export regulation, such as [Schrem-II](https://www.europarl.europa.eu/RegData/etudes/ATAG/2020/652073/EPRS_ATA(2020)652073_EN.pdf)
