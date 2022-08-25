@@ -1,0 +1,36 @@
+version: '2'
+
+services:
+
+  demo:
+    image: demo/mongodb:latest
+    volumes:
+      - "./data.json:/data.json"
+      - "data:/vanilla/data/"
+      - "logs:/vanilla/logs/"
+      - "sgx-data:/sgx/data/"
+      - "sgx-logs:/sgx/logs/"
+    entrypoint: tail -f /dev/null
+
+  vanilla:
+    image: demo/mongodb:latest
+    build: .
+    volumes:
+      - "data:/var/lib/mongodb/"
+      - "logs:/var/log/mongodb/"
+
+  sgx:
+    image: enclaive/mongodb-sgx:latest
+    devices:
+      - "/dev/sgx/enclave:/dev/sgx/enclave"
+      - "/dev/sgx/enclave:/dev/sgx_enclave"
+      - "/dev/sgx_provision:/dev/sgx_provision"
+    volumes:
+      - "sgx-data:/data/"
+      - "sgx-logs:/logs/"
+
+volumes:
+  data:
+  logs:
+  sgx-data:
+  sgx-logs:
