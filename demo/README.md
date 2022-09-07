@@ -1,11 +1,26 @@
-# Running
+# MongoDB-SGX Demonstration
+The goal is to show the mongo-sgx database remains encrypted while in use (recall, encryption at rest decrypts the data collection in memory to perform the database operation). To this end, we create a collection in the database and send some data. While we do that and import the data, we wiretap with the database and eavesdrop the file system using `fswatch`. The rationality is that the imported data is encrypted at any moment in time, while vanilla mongodb reveals the data.
 
+
+## Prerequisites
+
+Install PHP (version 8.0+)
+```
+sudo add-apt-repository ppa:ondrej/php
+suod apt update
+sudo apt install php8.1 php8.1-mbstring
+```
+to create a password list
 ```bash
 php generate_data.php > data.json
+```
+
+## Building and Running
+```bash
 docker-compose up -d
 ```
 
-# Demonstrating
+## Demonstation
 
 Use two shells in demo:
 
