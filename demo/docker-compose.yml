@@ -4,6 +4,7 @@ services:
 
   demo:
     image: demo/mongodb:latest
+    build: .
     volumes:
       - "./data.json:/data.json"
       - "data:/vanilla/data/"
