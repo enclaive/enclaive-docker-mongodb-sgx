@@ -5,6 +5,7 @@ services:
   demo:
     image: demo/mongodb:latest
     build: .
+    container_name: demo
     volumes:
       - "./data.json:/data.json"
       - "data:/vanilla/data/"
@@ -16,12 +17,14 @@ services:
   vanilla:
     image: demo/mongodb:latest
     build: .
+    container_name: mongodb
     volumes:
       - "data:/var/lib/mongodb/"
       - "logs:/var/log/mongodb/"
 
   sgx:
     image: enclaive/mongodb-sgx:latest
+    container_name: mongodb-sgx
     devices:
       - "/dev/sgx/enclave:/dev/sgx/enclave"
       - "/dev/sgx/enclave:/dev/sgx_enclave"
