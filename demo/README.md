@@ -17,7 +17,7 @@ php generate_data.php > data.json
 
 ## Building and Running
 ```bash
-docker compose up -d    # builds demo, vanilla and sgx container
+docker compose up -d    # builds demo, mongodb and mongodb-sgx container
 ```
 
 **Remarks:** Vanilla has a reduced sync-delay of 5 seconds. The sgx version takes 60 seconds to sync the imported data to disk, so you have to wait for a bit, but the output will eventually appear. This is a configuration option and not related to gramine. Compression is disabled for the vanilla showcase to easily recognize data in the output.
@@ -28,47 +28,70 @@ In which case prune the volume
 docker compose down
 docker container prune -f && docker volume prune -f
 ```
-## Demonstation
+## Setup
 
 Use two shells in demo:
 
 ```bash
-docker compose exec demo bash     # shell 1
-docker compose exec demo bash     # shell 2
+docker exec -it demo bash     # shell 1
+docker exec -it demo bash     # shell 2
 ```
 
+## Insert data and trace query (mongodb)
+Listen for changes in folder `/vanilla/data`
 ```bash
 # shell 1
-fswatch -artux --event=Created /sgx/data/       # detach (CTRL-Z)
-fswatch -artux --event=Created /vanilla/data/   # detach (CTRL-Z)
-
+fswatch -artux --event=Created /vanilla/data/   # 
+```
+Create a collection
+```bash
 # shell 2
-mongosh --host sgx
-> db.createCollection('data')
-> db.data.insertOne({"test":1})
-
-mongosh --host vanilla
+mongosh --host mongodb
 > db.createCollection('data')
 > db.data.insertOne({"test":1})
 ```
+resulting in writing file `/vanilla/data/collection-7--1408183255387016099.wt`.
 
-The file should be located somewhere at `/sgx/data/collection-7--4217537638384089610.wt`. Same goes for `/vanilla/data/collection-7--1408183255387016099.wt`.
-
-We can now watch the file as we import our data:
-
+Now trace the file
 ```bash
 # shell 1
-tail -q -c 0 -f /sgx/data/collection-*.wt     | strings
 tail -q -c 0 -f /vanilla/data/collection-*.wt | strings
-
+```
+and import the password list
+```
 # shell 2
-mongoimport --host sgx     data.json
-mongoimport --host vanilla data.json
+mongoimport --host mongodb data.json
 ```
 
+## Insert data and trace query (mongodb-sgx)
+Listen for changes in folder `/sgx/data`
+```bash
+# shell 1
+fswatch -artux --event=Created /sgx/data/    
+```
+Create a collection
+```bash
+# shell 2
+mongosh --host mongodb-sgx
+> db.createCollection('data')
+> db.data.insertOne({"test":1})
+```
+resulting in writing file `/sgx/data/collection-7--4217537638384089610.wt`
+
+Now trace the file
+```bash
+# shell 1
+tail -q -c 0 -f /sgx/data/collection-*.wt | strings
+```
+and import the password list
+```
+# shell 2
+mongoimport --host mongodb-sgx data.json
+```
+## Remarks
 Instead of `strings` we also could use `xxd -c 64`, but it is sometimes harder to find our imported data due to other things also written to this log.
 
-Or simply do a `grep`:
+Alternatively simply `grep` a username:
 
 ```bash
 grep -Ri testUsername /vanilla/ /sgx/
