@@ -1,7 +1,7 @@
 FROM ubuntu:focal
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends gnupg2 wget ca-certificates \
+    && apt-get install -y --no-install-recommends gnupg2 wget ca-certificates binutils fswatch\
     && wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/mongodb-org-6.0.gpg \
     && echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" > /etc/apt/sources.list.d/mongodb-org-6.0.list \
     && apt-get update \
