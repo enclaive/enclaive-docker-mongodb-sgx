@@ -17,24 +17,26 @@ php generate_data.php > data.json
 
 ## Building and Running
 ```bash
-docker-compose up -d
+docker compose up -d    # builds demo, vanilla and sgx container
 ```
+
+**Remarks:** Vanilla has a reduced sync-delay of 5 seconds. The sgx version takes 60 seconds to sync the imported data to disk, so you have to wait for a bit, but the output will eventually appear. This is a configuration option and not related to gramine. Compression is disabled for the vanilla showcase to easily recognize data in the output.
 
 ## Demonstation
 
 Use two shells in demo:
 
 ```bash
-docker-compose exec demo bash
-docker-compose exec demo bash
+docker compose exec demo bash     # shell 1
+docker compose exec demo bash     # shell 2
 ```
 
 ```bash
-# first
-fswatch -artux --event=Created /sgx/data/
-fswatch -artux --event=Created /vanilla/data/
+# shell 1
+fswatch -artux --event=Created /sgx/data/       # detach (CTRL-Z)
+fswatch -artux --event=Created /vanilla/data/   # detach (CTRL-Z)
 
-# second
+# shell 2
 mongosh --host sgx
 > db.createCollection('data')
 > db.data.insertOne({"test":1})
@@ -49,11 +51,11 @@ The file should be located somewhere at `/sgx/data/collection-7--421753763838408
 We can now watch the file as we import our data:
 
 ```bash
-# first
+# shell 1
 tail -q -c 0 -f /sgx/data/collection-*.wt     | strings
 tail -q -c 0 -f /vanilla/data/collection-*.wt | strings
 
-# second
+# shell 2
 mongoimport --host sgx     data.json
 mongoimport --host vanilla data.json
 ```
@@ -66,8 +68,4 @@ Or simply do a `grep`:
 grep -Ri testUsername /vanilla/ /sgx/
 ```
 
-# Notes
 
-Vanilla has a reduced sync-delay of 5 seconds. The sgx version takes 60 seconds to sync the imported data to disk, so you have to wait for a bit, but the output will eventually appear. This is a configuration option and not related to gramine.
-
-Compression is disabled for the vanilla showcase to easily recognize data in the output.
