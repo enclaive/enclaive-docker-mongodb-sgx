@@ -22,6 +22,12 @@ docker compose up -d    # builds demo, vanilla and sgx container
 
 **Remarks:** Vanilla has a reduced sync-delay of 5 seconds. The sgx version takes 60 seconds to sync the imported data to disk, so you have to wait for a bit, but the output will eventually appear. This is a configuration option and not related to gramine. Compression is disabled for the vanilla showcase to easily recognize data in the output.
 
+## Stopping and Restarting
+In which case prune the volume
+```
+docker compose down
+docker container prune -f && docker volume prune -f
+```
 ## Demonstation
 
 Use two shells in demo:
