@@ -30,7 +30,7 @@
 <table style="width:100%">
 <tr>
      <td align="center" width:"25%">
-        <a href="https://www.youtube.com/watch?v=V-eIfAX0B7U"><img src="https://img.youtube.com/vi/V-eIfAX0B7U/0.jpg"></img></a>
+        <a href="https://www.youtube.com/watch?v=3FCULfBqFN0"><img src="https://img.youtube.com/vi/3FCULfBqFN0/0.jpg"></img></a>
         <br>MongoDB-SGX keeps the import of passwords already encrypted while in use (<a href="https://github.com/enclaive/enclaive-docker-mongodb-sgx/tree/demo">code</a>)</td> 
      </td>
  </tr>
